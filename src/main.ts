@@ -191,7 +191,7 @@ class Notes {
 
 //button create note event listener
 const button = document.getElementById('create');
-button?.addEventListener('click', function handleClick(event) {
+button?.addEventListener('click', function handleClick() {
 
    let maxId = 0;
    if (localStorage.getItem('myNotes') !== null) {
