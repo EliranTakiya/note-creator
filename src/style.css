@@ -1,0 +1,188 @@
+#create {
+    background-color: aqua;
+    cursor: pointer;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+li {
+    float: left;
+    border-right: 1px solid #bbb;
+}
+
+li:last-child {
+    border-right: none;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover:not(.active) {
+    background-color: #111;
+}
+
+.active {
+    background-color: #81aa04;
+}
+
+#search {
+    margin: 12px;
+    float: right;
+}
+
+#deleteAll {
+    margin: 12px;
+    cursor: pointer;
+    float: right;
+    background-color: crimson;
+    color: white;
+}
+
+.deleteButton {
+    background-color: rgb(15, 97, 108);
+    cursor: pointer;
+}
+
+.container {
+    justify-content: center;
+    text-align: center;
+}
+
+.form-wrapper {
+    border: 1px groove rgb(162, 99, 222);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin: auto;
+    background-color: antiquewhite;
+}
+
+.note {
+    border-radius: 15px 5px 5px 5px;
+    margin: 5px 0px 0px 0px;
+    /* margin:auto; */
+    border: groove;
+    width: 33%;
+    margin: 0 auto;
+    margin-top: 3px;
+    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+    margin-bottom: 5px;
+}
+
+.notesDiv {
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 35px;
+}
+
+#due {
+    cursor: pointer;
+
+}
+
+#mySelect {
+    cursor: pointer;
+}
+
+input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+@media(max-width:1000px) {
+    .note {
+        width: 45%;
+    }
+}
+
+@media(max-width:500px) {
+    .note {
+        width: 90%;
+
+    }
+
+    #title {
+        width: 50%;
+        height: 20px;
+    }
+
+    #content {
+        width: 50%;
+    }
+
+    #due {
+        width: 50%;
+    }
+
+    h1 {
+        font-size: 30px;
+    }
+}
+
+@media(max-width:404px) {
+    #search {
+        margin-left: 0;
+        margin-right: 0;
+        /* width: 37%; */
+    }
+}
+
+@media(max-width:340px) {
+    #search {
+        width: 35%;
+        /* width: 37%; */
+    }
+}
+
+
+.form-border {
+    border: 2px solid lightskyblue;
+}
+
+
+h1 {
+    font-family: copperplate Gothic;
+    text-shadow: 2px 7px 5px rgba(0, 0, 0, 0.3),
+        0px -4px 10px rgba(255, 255, 255, 0.3);
+}
+
+.contentFont {
+    font-family: cursive;
+    font-size: larger;
+    height: 87px;
+}
+
+.titleFont {
+    font-family: verdana;
+    font-size: larger;
+    text-decoration: underline;
+}
+
+#noteId {
+    border: 1px #111 solid;
+    width: min-content;
+    margin: 0 auto;
+    display: flex;
+    background-color: rgb(205, 136, 205);
+}
+
+#count {
+    font-family: monospace;
+    font-size: xx-large;
+}
+
+#navbar {
+    position: fixed;
+    width: 100%;
+    top: 0;
+}
