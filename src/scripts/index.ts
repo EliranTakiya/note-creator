@@ -1,3 +1,5 @@
+import '../style.css'
+
 //constants.
 const titleDiv = document.getElementById('title',) as HTMLInputElement | null;
 const contentDiv = document.getElementById('content') as HTMLInputElement | null;
