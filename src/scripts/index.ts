@@ -4,7 +4,6 @@ import '../style.css'
 const titleDiv = document.getElementById('title',) as HTMLInputElement | null;
 const contentDiv = document.getElementById('content') as HTMLInputElement | null;
 const dueDateDiv = document.getElementById('due') as HTMLDataElement | null;
-const currDateDiv = document.getElementById('timeNow') as HTMLDataElement | null;
 const colorDiv = document.getElementById('mySelect') as HTMLDataElement
 const notes = document.getElementById('notesDiv') as HTMLDataElement | null;
 let noteIdDiv = document.getElementById('count') as HTMLDataElement;
