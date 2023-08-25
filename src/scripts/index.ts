@@ -212,17 +212,18 @@ button?.addEventListener('click', function handleClick() {
       let pickedDate = new Date(Date.parse(pickedDateStr.replace(/-/g, " ")));
       console.log(pickedDate)
       if (pickedDate < new Date()) {
-         const pop: HTMLElement | null = document.getElementById('popUp');
-         if (pop) {
-            pop.style.backgroundColor = 'lightgreen';
-            pop.style.display = 'block';
-            pop.style.color='black'
-            pop.innerHTML='invalid date!';
-         }
+         alert('invalid date come on')
+         // const pop: HTMLElement | null = document.getElementById('popUp');
+         // if (pop) {
+         //    pop.style.backgroundColor = 'lightgreen';
+         //    pop.style.display = 'block';
+         //    pop.style.color='black'
+         //    pop.innerHTML='invalid date!';
+         // }
 
-         setTimeout(function () {
-            if(pop) pop.style.display = 'none';
-           }, 3000)
+         // setTimeout(function () {
+         //    if(pop) pop.style.display = 'none';
+         //   }, 3000)
          dueDateDiv.value = "";
          return
       }
