@@ -105,7 +105,7 @@ input::-webkit-calendar-picker-indicator {
     }
 }
 
-@media(max-width:500px) {
+@media(max-width:550px) {
     .note {
         width: 90%;
 
@@ -158,13 +158,13 @@ h1 {
 
 .contentFont {
     font-family: Verdana;
-    font-size:larger;
     height: 105px;
+    font-size:small;
 }
 
 .titleFont {
     font-family: verdana;
-    font-size: larger;
+    font-size:medium;
     text-decoration: underline;
     word-wrap: break-word;
 }
