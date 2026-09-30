@@ -392,6 +392,7 @@ type ReminderNote = {
 const dueSummaryText = document.getElementById('dueSummaryText');
 const notificationsButton = document.getElementById('enableNotifications') as HTMLButtonElement | null;
 const notesContainer = document.getElementById('notesDiv');
+const notificationsEnabledKey = 'note-creator-notifications-enabled';
 
 function parseReminderDate(value: string): Date | null {
    const parts = value.split('-').map(Number);
@@ -437,16 +438,28 @@ function updateNotificationButton(): void {
    }
 
    notificationsButton.hidden = false;
-   notificationsButton.disabled = Notification.permission === 'denied' || Notification.permission === 'granted';
-   notificationsButton.textContent = Notification.permission === 'granted'
-      ? 'Browser notifications enabled'
-      : Notification.permission === 'denied'
-         ? 'Notifications blocked in browser settings'
-         : 'Enable browser notifications';
+   notificationsButton.disabled = Notification.permission === 'denied';
+   if (Notification.permission === 'denied') {
+      notificationsButton.textContent = 'Notifications blocked in browser settings';
+      notificationsButton.setAttribute('aria-pressed', 'false');
+      return;
+   }
+
+   if (Notification.permission !== 'granted') {
+      notificationsButton.textContent = 'Enable browser notifications';
+      notificationsButton.setAttribute('aria-pressed', 'false');
+      return;
+   }
+
+   const enabled = localStorage.getItem(notificationsEnabledKey) !== 'false';
+   notificationsButton.textContent = enabled
+      ? 'Turn off notifications from this site'
+      : 'Turn on notifications from this site';
+   notificationsButton.setAttribute('aria-pressed', String(enabled));
 }
 
 function sendDueTodayNotifications(notesToCheck: ReminderNote[], today: Date): void {
-   if (!('Notification' in window) || Notification.permission !== 'granted') {
+   if (!('Notification' in window) || Notification.permission !== 'granted' || localStorage.getItem(notificationsEnabledKey) === 'false') {
       return;
    }
 
@@ -553,12 +566,25 @@ function updateDueDateReminders(): void {
 
 updateNotificationButton();
 notificationsButton?.addEventListener('click', () => {
-   if ('Notification' in window) {
-      Notification.requestPermission().then(() => {
-         updateNotificationButton();
-         updateDueDateReminders();
-      });
+   if (!('Notification' in window)) {
+      return;
    }
+
+   if (Notification.permission === 'granted') {
+      const enabled = localStorage.getItem(notificationsEnabledKey) === 'false';
+      localStorage.setItem(notificationsEnabledKey, String(enabled));
+      updateNotificationButton();
+      updateDueDateReminders();
+      return;
+   }
+
+   Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+         localStorage.setItem(notificationsEnabledKey, 'true');
+      }
+      updateNotificationButton();
+      updateDueDateReminders();
+   });
 });
 
 if (notesContainer) {
