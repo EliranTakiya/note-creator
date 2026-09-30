@@ -9,6 +9,7 @@ const colorDiv = document.getElementById('mySelect') as HTMLDataElement
 const notes = document.getElementById('notesDiv') as HTMLDataElement | null;
 let noteIdDiv = document.getElementById('count') as HTMLDataElement;
 const deleteAllButton = document.getElementById('deleteAll') as HTMLButtonElement
+document.getElementById('refreshPage')?.addEventListener('click', () => window.location.reload());
 noteIdDiv.textContent = localStorage.getItem('amount')
 
 
