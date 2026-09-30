@@ -311,12 +311,12 @@ input::-webkit-calendar-picker-indicator {
 }
 
 .due-summary {
-    margin: 18px auto 4px;
+    margin: 18px auto 0;
     text-align: left;
 }
 
 .due-summary-content {
-    padding: 18px 22px 10px;
+    padding: 18px 22px 13px;
     border: 1px solid var(--line);
     border-left: 4px solid var(--leaf);
     border-radius: 8px;
@@ -325,7 +325,7 @@ input::-webkit-calendar-picker-indicator {
 }
 
 .due-summary h2 {
-    margin: 0 0 13px;
+    margin: 0 0 5px;
     color: var(--forest);
     font-family: Georgia, "Times New Roman", serif;
     font-size: 19px;
@@ -369,7 +369,7 @@ input::-webkit-calendar-picker-indicator {
 }
 
 .due-summary .due-summary-hint {
-    margin-top: 3px;
+    margin: 0 0 8px;
     color: var(--muted);
     font-size: 12px;
 }
@@ -575,7 +575,7 @@ footer p {
     }
 
     .due-summary-content {
-        padding: 16px 12px 14px;
+        padding: 16px 12px 13px;
     }
 
     .due-summary-table th {
