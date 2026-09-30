@@ -316,7 +316,7 @@ input::-webkit-calendar-picker-indicator {
 }
 
 .due-summary-content {
-    padding: 18px 22px 13px;
+    padding: 18px 22px 8px;
     border: 1px solid var(--line);
     border-left: 4px solid var(--leaf);
     border-radius: 8px;
@@ -518,7 +518,7 @@ footer p {
     }
 
     #app > div.container {
-        padding-top: 155px !important;
+        padding-top: 85px !important;
     }
 
     #navbar li a {
@@ -575,7 +575,7 @@ footer p {
     }
 
     .due-summary-content {
-        padding: 16px 12px 13px;
+        padding: 16px 12px 8px;
     }
 
     .due-summary-table th {
