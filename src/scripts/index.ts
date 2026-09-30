@@ -374,6 +374,183 @@ function myFixedFunction() {
    }
 }
 
+type ReminderNote = {
+   id: number | string;
+   title: string;
+   content: string;
+   dueDate: string;
+};
+
+const dueSummaryText = document.getElementById('dueSummaryText');
+const notificationsButton = document.getElementById('enableNotifications') as HTMLButtonElement | null;
+const notesContainer = document.getElementById('notesDiv');
+
+function parseReminderDate(value: string): Date | null {
+   const parts = value.split('-').map(Number);
+   if (parts.length !== 3 || parts.some(part => !Number.isInteger(part))) {
+      return null;
+   }
+
+   const [year, month, day] = parts[0] > 999
+      ? [parts[0], parts[1], parts[2]]
+      : [parts[2], parts[1], parts[0]];
+   const parsedDate = new Date(year, month - 1, day);
+
+   if (parsedDate.getFullYear() !== year || parsedDate.getMonth() !== month - 1 || parsedDate.getDate() !== day) {
+      return null;
+   }
+
+   return parsedDate;
+}
+
+function getDaysUntil(date: Date, today: Date): number {
+   const dueDay = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+   const currentDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+   return Math.round((dueDay - currentDay) / 86400000);
+}
+
+function readReminderNotes(): ReminderNote[] {
+   try {
+      const savedNotes = JSON.parse(localStorage.getItem('myNotes') || '[]');
+      return Array.isArray(savedNotes) ? savedNotes as ReminderNote[] : [];
+   } catch {
+      return [];
+   }
+}
+
+function updateNotificationButton(): void {
+   if (!notificationsButton) {
+      return;
+   }
+
+   if (!('Notification' in window) || !window.isSecureContext) {
+      notificationsButton.hidden = true;
+      return;
+   }
+
+   notificationsButton.hidden = false;
+   notificationsButton.disabled = Notification.permission === 'denied' || Notification.permission === 'granted';
+   notificationsButton.textContent = Notification.permission === 'granted'
+      ? 'Browser notifications enabled'
+      : Notification.permission === 'denied'
+         ? 'Notifications blocked in browser settings'
+         : 'Enable browser notifications';
+}
+
+function sendDueTodayNotifications(notesToCheck: ReminderNote[], today: Date): void {
+   if (!('Notification' in window) || Notification.permission !== 'granted') {
+      return;
+   }
+
+   for (const note of notesToCheck) {
+      const dueDate = parseReminderDate(note.dueDate);
+      if (!dueDate || getDaysUntil(dueDate, today) !== 0) {
+         continue;
+      }
+
+      const notificationKey = `due-notified:${note.id}:${dueDate.getFullYear()}-${dueDate.getMonth() + 1}-${dueDate.getDate()}`;
+      if (localStorage.getItem(notificationKey)) {
+         continue;
+      }
+
+      new Notification(`Due today: ${note.title}`, {
+         body: note.content || 'This note is due today.'
+      });
+      localStorage.setItem(notificationKey, 'true');
+   }
+}
+
+function updateDueDateReminders(): void {
+   const reminderNotes = readReminderNotes();
+   const today = new Date();
+   const noteById = new Map(reminderNotes.map(note => [String(note.id), note]));
+   let overdueCount = 0;
+   let dueTodayCount = 0;
+   let dueSoonCount = 0;
+
+   reminderNotes.forEach(note => {
+      const dueDate = parseReminderDate(note.dueDate);
+      if (!dueDate) {
+         return;
+      }
+
+      const daysUntil = getDaysUntil(dueDate, today);
+      if (daysUntil < 0) overdueCount++;
+      else if (daysUntil === 0) dueTodayCount++;
+      else if (daysUntil <= 3) dueSoonCount++;
+   });
+
+   if (dueSummaryText) {
+      dueSummaryText.textContent = overdueCount === 0 && dueTodayCount === 0 && dueSoonCount === 0
+         ? 'Nothing due today or in the next 3 days.'
+         : `Overdue: ${overdueCount} · Due today: ${dueTodayCount} · Coming up in 1-3 days: ${dueSoonCount}`;
+   }
+
+   document.querySelectorAll<HTMLElement>('#notesDiv .note').forEach(noteElement => {
+      const deleteButton = noteElement.querySelector<HTMLButtonElement>('.deleteButton');
+      const note = deleteButton ? noteById.get(deleteButton.id) : undefined;
+      const dueDate = note ? parseReminderDate(note.dueDate) : null;
+      let status = noteElement.querySelector<HTMLElement>('.due-status');
+
+      if (!note || !dueDate) {
+         status?.remove();
+         return;
+      }
+
+      const daysUntil = getDaysUntil(dueDate, today);
+      let statusText: string;
+      let statusClass: string;
+
+      if (daysUntil < 0) {
+         const overdueDays = Math.abs(daysUntil);
+         statusText = `Overdue by ${overdueDays} day${overdueDays === 1 ? '' : 's'}`;
+         statusClass = 'due-overdue';
+      } else if (daysUntil === 0) {
+         statusText = 'Due today';
+         statusClass = 'due-today';
+      } else if (daysUntil === 1) {
+         statusText = 'Due tomorrow';
+         statusClass = 'due-soon';
+      } else if (daysUntil <= 3) {
+         statusText = `Due in ${daysUntil} days`;
+         statusClass = 'due-soon';
+      } else {
+         statusText = `Due in ${daysUntil} days`;
+         statusClass = 'due-later';
+      }
+
+      if (!status) {
+         status = document.createElement('span');
+         status.className = 'due-status';
+         noteElement.insertBefore(status, noteElement.firstChild);
+      }
+
+      status.className = `due-status ${statusClass}`;
+      status.textContent = statusText;
+   });
+
+   sendDueTodayNotifications(reminderNotes, today);
+}
+
+updateNotificationButton();
+notificationsButton?.addEventListener('click', () => {
+   if ('Notification' in window) {
+      Notification.requestPermission().then(() => {
+         updateNotificationButton();
+         updateDueDateReminders();
+      });
+   }
+});
+
+if (notesContainer) {
+   new MutationObserver(updateDueDateReminders).observe(notesContainer, { childList: true, subtree: true });
+}
+
+updateDueDateReminders();
+window.setInterval(updateDueDateReminders, 60000);
+window.addEventListener('focus', updateDueDateReminders);
+document.addEventListener('visibilitychange', updateDueDateReminders);
+
 
 
 
