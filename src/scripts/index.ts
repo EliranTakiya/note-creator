@@ -4,6 +4,7 @@ import '../style.css'
 const titleDiv = document.getElementById('title',) as HTMLInputElement | null;
 const contentDiv = document.getElementById('content') as HTMLInputElement | null;
 const dueDateDiv = document.getElementById('due') as HTMLDataElement | null;
+const reminderTimeDiv = document.getElementById('reminderTime') as HTMLInputElement | null;
 const colorDiv = document.getElementById('mySelect') as HTMLDataElement
 const notes = document.getElementById('notesDiv') as HTMLDataElement | null;
 let noteIdDiv = document.getElementById('count') as HTMLDataElement;
@@ -34,7 +35,9 @@ if (localStorage.getItem('myNotes') !== null) {
       content1.textContent = getData[i].content;
       content1.style.wordBreak = 'break-word';
       content1.className = 'contentFont';
-      dueTime1.textContent = `Due to: ${getData[i].dueDate}`;
+      dueTime1.textContent = getData[i].reminderTime
+         ? `Due to: ${getData[i].dueDate} at ${getData[i].reminderTime}`
+         : `Due to: ${getData[i].dueDate}`;
       curTime1.textContent = `Created on: ${getData[i].curDate}`;
       deleteBtn.textContent = 'delete';
       deleteBtn.className = 'deleteButton'
@@ -120,7 +123,9 @@ button1?.addEventListener('click', () => {
       content1.style.wordBreak = 'break-word'
       content1.className = 'contentFont';
 
-      dueTime1.textContent = `Due to: ${getData[i].dueDate}`;
+      dueTime1.textContent = getData[i].reminderTime
+         ? `Due to: ${getData[i].dueDate} at ${getData[i].reminderTime}`
+         : `Due to: ${getData[i].dueDate}`;
       curTime1.textContent = `Created on: ${getData[i].curDate}`;
       deleteBtn2.textContent = 'delete';
       deleteBtn2.className = 'deleteButton'
@@ -177,13 +182,15 @@ class Notes {
    public title: string
    public content: string
    public dueDate: string
+   public reminderTime: string
    public curDate: string
    public color: string
    public id: number
-   constructor(title: string, content: string, dueDate: string, curDate: string, color: string, id: number) {
+   constructor(title: string, content: string, dueDate: string, reminderTime: string, curDate: string, color: string, id: number) {
       this.title = title;
       this.content = content;
       this.dueDate = dueDate;
+      this.reminderTime = reminderTime;
       this.curDate = curDate
       this.color = color;
       this.id = id
@@ -232,7 +239,7 @@ button?.addEventListener('click', function handleClick() {
       let value = localStorage.getItem('amount')
       noteIdDiv.textContent = (Number(value) + 1).toString()
       //creating the note object
-      const yes = new Notes(titleDiv?.value, contentDiv?.value, dueDateDiv.value, new Date().toLocaleString(), colorDiv.value, maxId + 1);
+      const yes = new Notes(titleDiv?.value, contentDiv?.value, dueDateDiv.value, reminderTimeDiv?.value || '09:00', new Date().toLocaleString(), colorDiv.value, maxId + 1);
       // console.log(yes); notes1.style.backgroundColor = yes.color
 
       //saving each note as a single object to local storage with amount count
@@ -277,7 +284,7 @@ button?.addEventListener('click', function handleClick() {
       content.style.wordBreak = 'break-word'
       content.className = 'contentFont';
 
-      dueTime.textContent = `Due to: ${yes.dueDate}`;
+      dueTime.textContent = `Due to: ${yes.dueDate} at ${yes.reminderTime}`;
       curTime.textContent = `Created on: ${new Date().toLocaleString()}`;
       deleteBtn.textContent = 'delete';
       deleteBtn.className = 'deleteButton';
@@ -379,6 +386,7 @@ type ReminderNote = {
    title: string;
    content: string;
    dueDate: string;
+   reminderTime?: string;
 };
 
 const dueSummaryText = document.getElementById('dueSummaryText');
@@ -445,6 +453,12 @@ function sendDueTodayNotifications(notesToCheck: ReminderNote[], today: Date): v
    for (const note of notesToCheck) {
       const dueDate = parseReminderDate(note.dueDate);
       if (!dueDate || getDaysUntil(dueDate, today) !== 0) {
+         continue;
+      }
+
+      const [reminderHour, reminderMinute] = (note.reminderTime || '00:00').split(':').map(Number);
+      const currentMinutes = today.getHours() * 60 + today.getMinutes();
+      if (currentMinutes < reminderHour * 60 + reminderMinute) {
          continue;
       }
 
@@ -525,8 +539,13 @@ function updateDueDateReminders(): void {
          noteElement.insertBefore(status, noteElement.firstChild);
       }
 
-      status.className = `due-status ${statusClass}`;
-      status.textContent = statusText;
+      const nextStatusClass = `due-status ${statusClass}`;
+      if (status.className !== nextStatusClass) {
+         status.className = nextStatusClass;
+      }
+      if (status.textContent !== statusText) {
+         status.textContent = statusText;
+      }
    });
 
    sendDueTodayNotifications(reminderNotes, today);

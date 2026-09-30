@@ -201,6 +201,7 @@ h1 {
 #title,
 #content,
 #due,
+#reminderTime,
 #mySelect {
     display: block;
     width: 100%;
@@ -224,12 +225,14 @@ h1 {
 #title:focus,
 #content:focus,
 #due:focus,
+#reminderTime:focus,
 #mySelect:focus {
     border-color: #7eaa65 !important;
     box-shadow: 0 0 0 3px rgba(126, 170, 101, 0.16);
 }
 
 #due,
+#reminderTime,
 #mySelect,
 input::-webkit-calendar-picker-indicator {
     cursor: pointer;
