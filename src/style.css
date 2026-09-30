@@ -511,14 +511,14 @@ footer p {
 
 @media (max-width: 550px) {
     #navbar {
-        position: fixed;
+        position: sticky;
         flex-wrap: wrap;
         min-height: 0;
         padding: 10px 12px;
     }
 
     #app > div.container {
-        padding-top: 85px !important;
+        padding-top: 0 !important;
     }
 
     #navbar li a {
