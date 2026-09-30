@@ -441,7 +441,7 @@ function updateNotificationButton(): void {
    }
 
    notificationsButton.hidden = false;
-   notificationsButton.disabled = Notification.permission === 'denied';
+   notificationsButton.disabled = false;
    if (Notification.permission === 'denied') {
       notificationsButton.textContent = 'Notifications blocked';
       notificationsButton.setAttribute('aria-pressed', 'false');
@@ -566,6 +566,11 @@ function updateDueDateReminders(): void {
 updateNotificationButton();
 notificationsButton?.addEventListener('click', () => {
    if (!('Notification' in window)) {
+      return;
+   }
+
+   if (Notification.permission === 'denied') {
+      alert('Notifications are blocked by your browser. Allow notifications for this site in your browser settings, then reload the page.');
       return;
    }
 
