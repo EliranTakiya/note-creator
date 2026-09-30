@@ -17,12 +17,14 @@
     <ul id="navbar">
       <li><a id="top" class="active" href="#app">Home</a></li>
       <li><a id="sort" href="#">Sort A-Z</a></li>
-      <button type="button" id="refreshPage">Refresh</button>
-      <button class="due-notifications" id="enableNotifications" type="button" aria-pressed="false">Notifications OFF</button>
+      <li class="navbar-actions">
+        <button type="button" id="refreshPage">Refresh</button>
+        <button class="due-notifications" id="enableNotifications" type="button" aria-pressed="false">Notifications OFF</button>
+        <button type="button" class="deleteAll" id="deleteAll">Delete All</button>
+      </li>
       <!-- <li><a id="popUp" style="display: none;"></a></li> -->
 
       <!-- <li><a href="#">Filter By CreationDate</a></li> -->
-      <button type="button" class="deleteAll" id="deleteAll">Delete All</button>
       <input onkeyup="myFunction()" type="search" placeholder="Search" class="search" id="search">
     </ul><br>
     <div style="padding-top: 85px;" class="container">
