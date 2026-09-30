@@ -311,12 +311,12 @@ input::-webkit-calendar-picker-indicator {
 }
 
 .due-summary {
-    margin: 18px auto 0;
+    margin: 18px auto 8px;
     text-align: left;
 }
 
 .due-summary-content {
-    padding: 18px 22px 8px;
+    padding: 18px 22px 0;
     border: 1px solid var(--line);
     border-left: 4px solid var(--leaf);
     border-radius: 8px;
@@ -575,7 +575,7 @@ footer p {
     }
 
     .due-summary-content {
-        padding: 16px 12px 8px;
+        padding: 16px 12px 0;
     }
 
     .due-summary-table th {
