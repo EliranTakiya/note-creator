@@ -136,9 +136,33 @@ select {
 }
 
 .due-notifications {
+    display: inline-flex;
     flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 0 11px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 7px;
     color: #fff;
-    background: var(--forest);
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.due-notifications::before {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 9px;
+    border-radius: 50%;
+    background: #e26a5b;
+    box-shadow: 0 0 0 3px rgba(226, 106, 91, 0.16);
+    content: "";
+}
+
+.due-notifications[aria-pressed="true"]::before {
+    background: #a8d86d;
+    box-shadow: 0 0 0 3px rgba(168, 216, 109, 0.17), 0 0 10px rgba(168, 216, 109, 0.5);
 }
 
 .due-notifications:disabled {
@@ -285,11 +309,7 @@ input::-webkit-calendar-picker-indicator {
 }
 
 .due-summary-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 18px 22px;
+    padding: 18px 22px 16px;
     border: 1px solid var(--line);
     border-left: 4px solid var(--leaf);
     border-radius: 8px;
@@ -298,11 +318,40 @@ input::-webkit-calendar-picker-indicator {
 }
 
 .due-summary h2 {
-    margin: 0 0 5px;
+    margin: 0 0 13px;
     color: var(--forest);
     font-family: Georgia, "Times New Roman", serif;
     font-size: 19px;
     font-weight: 700;
+}
+
+.due-summary-table {
+    width: 100%;
+    max-width: 620px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    text-align: center;
+}
+
+.due-summary-table th {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.due-summary-table td {
+    padding: 10px;
+    color: var(--forest);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.due-summary-table td + td,
+.due-summary-table th + th {
+    border-left: 1px solid var(--line);
 }
 
 .due-summary p {
@@ -461,6 +510,10 @@ footer p {
         padding: 10px 12px;
     }
 
+    #app > div.container {
+        padding-top: 155px !important;
+    }
+
     #navbar li a {
         padding: 9px 10px;
         font-size: 13px;
@@ -499,9 +552,16 @@ footer p {
     }
 
     .due-summary-content {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 12px;
-        padding: 16px;
+        padding: 16px 12px 14px;
+    }
+
+    .due-summary-table th {
+        padding: 8px 4px;
+        font-size: 10px;
+    }
+
+    .due-summary-table td {
+        padding: 8px 4px;
+        font-size: 20px;
     }
 }

@@ -390,7 +390,9 @@ type ReminderNote = {
    reminderTime?: string;
 };
 
-const dueSummaryText = document.getElementById('dueSummaryText');
+const overdueCountText = document.getElementById('overdueCount');
+const dueTodayCountText = document.getElementById('dueTodayCount');
+const dueSoonCountText = document.getElementById('dueSoonCount');
 const notificationsButton = document.getElementById('enableNotifications') as HTMLButtonElement | null;
 const notesContainer = document.getElementById('notesDiv');
 const notificationsEnabledKey = 'note-creator-notifications-enabled';
@@ -441,21 +443,19 @@ function updateNotificationButton(): void {
    notificationsButton.hidden = false;
    notificationsButton.disabled = Notification.permission === 'denied';
    if (Notification.permission === 'denied') {
-      notificationsButton.textContent = 'Notifications blocked in browser settings';
+      notificationsButton.textContent = 'Notifications blocked';
       notificationsButton.setAttribute('aria-pressed', 'false');
       return;
    }
 
    if (Notification.permission !== 'granted') {
-      notificationsButton.textContent = 'Enable browser notifications';
+      notificationsButton.textContent = 'Notifications OFF';
       notificationsButton.setAttribute('aria-pressed', 'false');
       return;
    }
 
    const enabled = localStorage.getItem(notificationsEnabledKey) !== 'false';
-   notificationsButton.textContent = enabled
-      ? 'Turn off notifications from this site'
-      : 'Turn on notifications from this site';
+   notificationsButton.textContent = enabled ? 'Notifications ON' : 'Notifications OFF';
    notificationsButton.setAttribute('aria-pressed', String(enabled));
 }
 
@@ -508,11 +508,9 @@ function updateDueDateReminders(): void {
       else if (daysUntil <= 3) dueSoonCount++;
    });
 
-   if (dueSummaryText) {
-      dueSummaryText.textContent = overdueCount === 0 && dueTodayCount === 0 && dueSoonCount === 0
-         ? 'Nothing due today or in the next 3 days.'
-         : `Overdue: ${overdueCount} · Due today: ${dueTodayCount} · Coming up in 1-3 days: ${dueSoonCount}`;
-   }
+   if (overdueCountText) overdueCountText.textContent = String(overdueCount);
+   if (dueTodayCountText) dueTodayCountText.textContent = String(dueTodayCount);
+   if (dueSoonCountText) dueSoonCountText.textContent = String(dueSoonCount);
 
    document.querySelectorAll<HTMLElement>('#notesDiv .note').forEach(noteElement => {
       const deleteButton = noteElement.querySelector<HTMLButtonElement>('.deleteButton');
