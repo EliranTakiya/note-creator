@@ -576,6 +576,7 @@ footer p {
 
     .due-summary-content {
         padding: 16px 12px 0;
+        margin-bottom:29px;
     }
 
     .due-summary-table th {
