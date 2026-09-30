@@ -396,6 +396,12 @@ const dueSoonCountText = document.getElementById('dueSoonCount');
 const notificationsButton = document.getElementById('enableNotifications') as HTMLButtonElement | null;
 const notesContainer = document.getElementById('notesDiv');
 const notificationsEnabledKey = 'note-creator-notifications-enabled';
+const isIosDevice = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isHomeScreenApp = window.matchMedia('(display-mode: standalone)').matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
+const serviceWorkerReady = 'serviceWorker' in navigator
+   ? navigator.serviceWorker.register('./sw.js').then(() => navigator.serviceWorker.ready).catch(() => null)
+   : Promise.resolve(null);
+const pendingNotifications = new Set<string>();
 
 function parseReminderDate(value: string): Date | null {
    const parts = value.split('-').map(Number);
@@ -435,13 +441,25 @@ function updateNotificationButton(): void {
       return;
    }
 
-   if (!('Notification' in window) || !window.isSecureContext) {
+   if (!window.isSecureContext) {
       notificationsButton.hidden = true;
       return;
    }
 
    notificationsButton.hidden = false;
    notificationsButton.disabled = false;
+   if (isIosDevice && !isHomeScreenApp) {
+      notificationsButton.textContent = 'Add to Home Screen for notifications';
+      notificationsButton.setAttribute('aria-pressed', 'false');
+      return;
+   }
+
+   if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+      notificationsButton.textContent = 'Notifications unavailable';
+      notificationsButton.setAttribute('aria-pressed', 'false');
+      return;
+   }
+
    if (Notification.permission === 'denied') {
       notificationsButton.textContent = 'Notifications blocked';
       notificationsButton.setAttribute('aria-pressed', 'false');
@@ -477,14 +495,26 @@ function sendDueTodayNotifications(notesToCheck: ReminderNote[], today: Date): v
       }
 
       const notificationKey = `due-notified:${note.id}:${dueDate.getFullYear()}-${dueDate.getMonth() + 1}-${dueDate.getDate()}`;
-      if (localStorage.getItem(notificationKey)) {
+      if (localStorage.getItem(notificationKey) || pendingNotifications.has(notificationKey)) {
          continue;
       }
 
-      new Notification(`Due today: ${note.title}`, {
-         body: note.content || 'This note is due today.'
+      pendingNotifications.add(notificationKey);
+      void serviceWorkerReady.then(registration => {
+         if (!registration) {
+            throw new Error('Service worker is unavailable');
+         }
+         return registration.showNotification(`Due today: ${note.title}`, {
+            body: note.content || 'This note is due today.',
+            tag: notificationKey
+         });
+      }).then(() => {
+         localStorage.setItem(notificationKey, 'true');
+      }).catch(() => {
+         console.warn('Could not show the due-date notification.');
+      }).finally(() => {
+         pendingNotifications.delete(notificationKey);
       });
-      localStorage.setItem(notificationKey, 'true');
    }
 }
 
@@ -565,7 +595,13 @@ function updateDueDateReminders(): void {
 
 updateNotificationButton();
 notificationsButton?.addEventListener('click', () => {
+   if (isIosDevice && !isHomeScreenApp) {
+      alert('On iPhone, add this website to your Home Screen, open it from its icon, then enable notifications.');
+      return;
+   }
+
    if (!('Notification' in window)) {
+      alert('Notifications are not supported in this browser.');
       return;
    }
 
@@ -576,6 +612,18 @@ notificationsButton?.addEventListener('click', () => {
 
    if (Notification.permission === 'granted') {
       const enabled = localStorage.getItem(notificationsEnabledKey) === 'false';
+      if (enabled) {
+         void serviceWorkerReady.then(registration => {
+            if (!registration) {
+               alert('Could not prepare notifications. Reload the page and try again.');
+               return;
+            }
+            localStorage.setItem(notificationsEnabledKey, 'true');
+            updateNotificationButton();
+            updateDueDateReminders();
+         });
+         return;
+      }
       localStorage.setItem(notificationsEnabledKey, String(enabled));
       updateNotificationButton();
       updateDueDateReminders();
@@ -584,10 +632,18 @@ notificationsButton?.addEventListener('click', () => {
 
    Notification.requestPermission().then(permission => {
       if (permission === 'granted') {
-         localStorage.setItem(notificationsEnabledKey, 'true');
+         void serviceWorkerReady.then(registration => {
+            if (!registration) {
+               alert('Could not prepare notifications. Reload the page and try again.');
+               return;
+            }
+            localStorage.setItem(notificationsEnabledKey, 'true');
+            updateNotificationButton();
+            updateDueDateReminders();
+         });
+         return;
       }
       updateNotificationButton();
-      updateDueDateReminders();
    });
 });
 
